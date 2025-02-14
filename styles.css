@@ -4,25 +4,29 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f9e3e3;
+    background: hsla(319, 94%, 49%, 1);
+    background: radial-gradient(circle, hsla(319, 94%, 49%, 1) 0%, hsla(319, 82%, 52%, 1) 8%, hsla(319, 83%, 54%, 1) 42%, hsla(314, 96%, 72%, 1) 64%, hsla(316, 91%, 67%, 1) 74%, hsla(313, 100%, 75%, 1) 84%, hsla(309, 53%, 64%, 1) 100%);
+    background: -moz-radial-gradient(circle, hsla(319, 94%, 49%, 1) 0%, hsla(319, 82%, 52%, 1) 8%, hsla(319, 83%, 54%, 1) 42%, hsla(314, 96%, 72%, 1) 64%, hsla(316, 91%, 67%, 1) 74%, hsla(313, 100%, 75%, 1) 84%, hsla(309, 53%, 64%, 1) 100%);
+    background: -webkit-radial-gradient(circle, hsla(319, 94%, 49%, 1) 0%, hsla(319, 82%, 52%, 1) 8%, hsla(319, 83%, 54%, 1) 42%, hsla(314, 96%, 72%, 1) 64%, hsla(316, 91%, 67%, 1) 74%, hsla(313, 100%, 75%, 1) 84%, hsla(309, 53%, 64%, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#F507AA", endColorstr="#e91fa8", GradientType=1);
     font-family: 'Arial', sans-serif;
     flex-direction: column;
-  }
-  
-  .container {
+}
+
+.container {
     text-align: center;
-  }
-  
-  h1 {
+}
+
+h1 {
     font-size: 2.5em;
-    color: #d32f2f;
-  }
-  
-  .buttons {
+    color: #ffd7fd;
+}
+
+.buttons {
     margin-top: 20px;
-  }
-  
-  .yes-button {
+}
+
+.yes-button {
     font-size: 1.5em;
     padding: 10px 20px;
     margin-right: 10px;
@@ -31,9 +35,9 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-  }
-  
-  .no-button {
+}
+
+.no-button {
     font-size: 1.5em;
     padding: 10px 20px;
     background-color: #f44336;
@@ -41,11 +45,11 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-  }
-  
-  .gif_container img {
+}
+
+.gif_container img {
     max-width: 100%;
     height: auto;
     border-radius: 10px;
     margin-top: 20px;
-  }
+}
