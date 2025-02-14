@@ -4,7 +4,11 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f9e3e3;
+    background: hsla(341, 100%, 50%, 1);
+    background: radial-gradient(circle, hsla(341, 100%, 50%, 1) 0%, hsla(16, 90%, 77%, 1) 100%, hsla(351, 100%, 58%, 1) 100%);
+    background: -moz-radial-gradient(circle, hsla(341, 100%, 50%, 1) 0%, hsla(16, 90%, 77%, 1) 100%, hsla(351, 100%, 58%, 1) 100%);
+    background: -webkit-radial-gradient(circle, hsla(341, 100%, 50%, 1) 0%, hsla(16, 90%, 77%, 1) 100%, hsla(351, 100%, 58%, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#FF0051", endColorstr="#f9ab8f", GradientType=1);
     font-family: 'Arial', sans-serif;
 }
 
@@ -14,7 +18,7 @@ body {
 
 .header_text {
     font-size: 3em;
-    color: #d32f2f;
+    color: #FFFFFF;
 }
 
 .gif_container img {
