@@ -4,7 +4,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f9e3e3;
+    background-color: #ae00ff;
     font-family: 'Arial', sans-serif;
     flex-direction: column;
   }
@@ -15,7 +15,7 @@ body {
   
   h1 {
     font-size: 2.5em;
-    color: #d32f2f;
+    color: #ffffff;
   }
   
   .buttons {
