@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Istoric și Rapoarte - Monitorizare Vehicule</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .history-container {
+            padding: 20px;
+            background-color: #fff;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .controls label, .controls select, .controls button {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .summary h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Monitorizare Vehicule Transport</h1>
+        <nav>
+            <a href="{{ url_for('index') }}" id="navIndex">Hartă Live</a>
+            <a href="{{ url_for('history_page') }}" id="navHistory">Istoric și Rapoarte</a>
+            <a href="{{ url_for('maintenance_page') }}" id="navMaintenance">Mentenanță</a>
+        </nav>
+    </header>
+
+    <main class="content-page-container">
+        <h2 class="page-title">Istoric Detaliat și Rapoarte</h2>
+
+        <div class="controls">
+            <label for="historyVehicleSelect">Selectează Vehicul:</label>
+            <select id="historyVehicleSelect">
+                <option value="">-- Selectează un vehicul --</option>
+                {% for vehicle in vehicles %}
+                <option value="{{ vehicle.vehicle_id }}">{{ vehicle.vehicle_id }}</option>
+                {% endfor %}
+            </select>
+            <label for="startDate">Data Început (Opțional):</label>
+            <input type="date" id="startDate">
+            <label for="endDate">Data Sfârșit (Opțional):</label>
+            <input type="date" id="endDate">
+            <button id="fetchHistoryDataBtn">Afișează Date</button>
+        </div>
+
+        <div id="reportSummary" class="summary" style="display:none;">
+            <h3>Sumar Raport</h3>
+            <p><strong>Vehicul:</strong> <span id="summaryVehicleId">N/A</span></p>
+            <p><strong>Perioadă:</strong> <span id="summaryPeriod">N/A</span></p>
+            <p><strong>Total Ore de Funcționare (estimate):</strong> <span id="summaryEngineHours">N/A</span></p>
+            <p><strong>Total Combustibil Consumat (estimat):</strong> <span id="summaryFuelConsumed">N/A</span></p>
+            <p><strong>Distanță Parcursă (estimată):</strong> <span id="summaryDistance">N/A</span></p>
+        </div>
+
+        <div id="historyTableContainer">
+            <p>Selectați un vehicul și apăsați "Afișează Date" pentru a vedea istoricul.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Latitudine</th>
+                        <th>Longitudine</th>
+                        <th>Viteză (km/h)</th>
+                        <th>Nivel Combustibil (L)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- Datele vor fi populate de JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Aplicație Monitorizare Vehicule</p>
+    </footer>
+
+    <script>
+        // Basic JavaScript for fetching and displaying data will go here
+        // This will be similar to parts of map.js but for the history page
+
+        const historyVehicleSelect = document.getElementById('historyVehicleSelect');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const fetchHistoryDataBtn = document.getElementById('fetchHistoryDataBtn');
+        const historyTableBody = document.getElementById('historyTableBody');
+        const historyTableContainer = document.getElementById('historyTableContainer');
+
+        const reportSummaryDiv = document.getElementById('reportSummary');
+        const summaryVehicleIdSpan = document.getElementById('summaryVehicleId');
+        const summaryPeriodSpan = document.getElementById('summaryPeriod');
+        const summaryEngineHoursSpan = document.getElementById('summaryEngineHours');
+        const summaryFuelConsumedSpan = document.getElementById('summaryFuelConsumed');
+        const summaryDistanceSpan = document.getElementById('summaryDistance');
+
+
+        fetchHistoryDataBtn.addEventListener('click', async () => {
+            const vehicleId = historyVehicleSelect.value;
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (!vehicleId) {
+                alert("Vă rugăm să selectați un vehicul.");
+                return;
+            }
+
+            // Fetch detailed history
+            let historyUrl = `/api/vehicle/${vehicleId}/history`;
+            const params = new URLSearchParams();
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (params.toString()) historyUrl += `?${params.toString()}`;
+
+            try {
+                const response = await fetch(historyUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                historyTableBody.innerHTML = ''; // Clear previous data
+                if (data.length > 0) {
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.timestamp}</td>
+                            <td>${row.latitude.toFixed(4)}</td>
+                            <td>${row.longitude.toFixed(4)}</td>
+                            <td>${row.speed !== null ? row.speed.toFixed(2) : 'N/A'}</td>
+                            <td>${row.fuel_level !== null ? row.fuel_level.toFixed(2) : 'N/A'}</td>
+                            <td>${row.status}</td>
+                        `;
+                        historyTableBody.appendChild(tr);
+                    });
+                    historyTableContainer.querySelector('p').style.display = 'none';
+                } else {
+                    historyTableBody.innerHTML = '<tr><td colspan="6">Nu s-au găsit date pentru criteriile selectate.</td></tr>';
+                    historyTableContainer.querySelector('p').style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Error fetching detailed history:", error);
+                historyTableBody.innerHTML = '<tr><td colspan="6">Eroare la încărcarea datelor.</td></tr>';
+            }
+
+            // Fetch summary data
+            let summaryUrl = `/api/vehicle/${vehicleId}/operational_summary`;
+             if (params.toString()) summaryUrl += `?${params.toString()}`;
+
+            try {
+                const summaryResponse = await fetch(summaryUrl);
+                if(!summaryResponse.ok) throw new Error(`HTTP error! status: ${summaryResponse.status}`);
+                const summaryData = await summaryResponse.json();
+
+                summaryVehicleIdSpan.textContent = vehicleId;
+                summaryPeriodSpan.textContent = `${startDate || 'Început'} - ${endDate || 'Prezent'}`;
+                summaryEngineHoursSpan.textContent = summaryData.total_engine_hours ? summaryData.total_engine_hours.toFixed(2) + ' ore' : 'N/A';
+                summaryFuelConsumedSpan.textContent = summaryData.total_fuel_consumed ? summaryData.total_fuel_consumed.toFixed(2) + ' L' : 'N/A';
+                summaryDistanceSpan.textContent = summaryData.total_distance_km ? summaryData.total_distance_km.toFixed(2) + ' km' : 'N/A';
+                reportSummaryDiv.style.display = 'block';
+
+            } catch (error) {
+                console.error("Error fetching summary data:", error);
+                reportSummaryDiv.style.display = 'none';
+                alert("Eroare la încărcarea sumarului raportului.");
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('navHistory').classList.add('active');
+        });
+    </script>
+</body>
+</html>

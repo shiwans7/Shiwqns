@@ -1,0 +1,240 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #eef1f5; /* Slightly different background */
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #2c3e50; /* Darker blue */
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+nav {
+    margin-top: 0.5rem;
+}
+
+nav a {
+    color: #ecf0f1; /* Lighter text for links */
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover, nav a.active {
+    background-color: #3498db; /* Brighter blue for hover/active */
+    color: white;
+}
+
+.container {
+    display: flex;
+    flex-grow: 1;
+    padding: 1.5rem; /* More padding */
+    gap: 1.5rem;
+}
+
+.sidebar {
+    width: 300px;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.sidebar h2, .page-title { /* .page-title for history/maintenance pages */
+    margin-top: 0;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.6rem;
+    font-size: 1.4rem;
+}
+
+/* Generic form controls styling */
+label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    color: #555;
+}
+
+select, input[type="date"], button {
+    width: 100%;
+    padding: 0.75rem; /* Larger padding */
+    border: 1px solid #bdc3c7; /* Softer border */
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem; /* Consistent margin */
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    border: none; /* Remove border for buttons if background is enough */
+}
+
+button:hover {
+    background-color: #2980b9; /* Darker shade for hover */
+}
+
+#clearHistoryBtn {
+    background-color: #e74c3c; /* Red for destructive action */
+}
+#clearHistoryBtn:hover {
+    background-color: #c0392b;
+}
+
+.vehicle-selector label, .vehicle-selector select { /* Specific to map sidebar */
+     margin-bottom: 0.5rem; /* Keep original map sidebar spacing */
+}
+.sidebar button { /* Specific to map sidebar */
+    margin-bottom: 0.5rem;
+}
+
+
+.vehicle-info-panel {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa; /* Lighter background */
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+}
+.vehicle-info-panel h3 {
+    margin-top: 0;
+    color: #34495e; /* Darker text for panel title */
+    font-size: 1.1rem;
+}
+.vehicle-info-panel p {
+    font-size: 0.9rem;
+    color: #555;
+    word-wrap: break-word;
+    margin-bottom: 0.4rem;
+}
+
+
+main {
+    flex-grow: 1;
+    display: flex;
+}
+
+#mapid { /* Specific to map page */
+    height: 100%;
+    width: 100%;
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Styles for history and maintenance pages */
+.content-page-container { /* Used in history.html, maintenance.html */
+    width: 100%;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 8px;
+}
+
+.controls { /* For history and maintenance pages */
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+.controls label { margin-bottom: 0; } /* Align labels better in flex */
+.controls select, .controls input[type="date"], .controls button {
+    margin-bottom: 0; /* Remove bottom margin when in .controls */
+    min-width: 150px; /* Prevent controls from becoming too small */
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+th, td {
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem; /* More padding in cells */
+    text-align: left;
+    font-size: 0.9rem;
+}
+th {
+    background-color: #f2f7fc; /* Light blueish gray for headers */
+    font-weight: 600;
+    color: #333;
+}
+tbody tr:nth-child(even) {
+    background-color: #fdfdfd; /* Subtle striping for rows */
+}
+tbody tr:hover {
+    background-color: #f1f8ff; /* Hover effect for rows */
+}
+
+.summary, .vehicle-status-card { /* For history and maintenance pages */
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background-color: #e9f5ff; /* Light blue background */
+    border: 1px solid #cce4ff;
+    border-radius: 5px;
+    color: #334;
+}
+.summary h3, .vehicle-status-card h3 {
+    margin-top: 0;
+    color: #0056b3; /* Darker blue for summary titles */
+}
+
+/* Maintenance page specific progress bars */
+.maintenance-item {
+    border: 1px solid #e0e0e0;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+}
+.maintenance-item h4 { margin-top: 0; color: #2c3e50; }
+.progress-bar-container {
+    width: 100%; background-color: #e0e0e0; border-radius: 4px; margin: 0.5rem 0;
+}
+.progress-bar {
+    height: 22px; line-height: 22px; text-align: center; color: white;
+    background-color: #5cb85c; /* Green */
+    border-radius: 4px; font-size: 0.85em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    transition: width 0.5s ease-in-out;
+}
+.progress-bar.warning { background-color: #f0ad4e; /* Orange */ }
+.progress-bar.danger { background-color: #d9534f; /* Red */ }
+
+
+footer {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 1.2rem 0;
+    width: 100%;
+    margin-top: auto; /* Pushes footer to bottom */
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentenanță Preventivă - Monitorizare Vehicule</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .maintenance-container {
+            padding: 20px;
+            background-color: #fff;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .vehicle-status-card {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .maintenance-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .maintenance-item h4 {
+            margin-top: 0;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .progress-bar {
+            height: 20px;
+            line-height: 20px; /* Centrare text vertical */
+            text-align: center;
+            color: white;
+            background-color: #4caf50; /* Verde implicit */
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .progress-bar.warning { background-color: #ff9800; /* Portocaliu */ }
+        .progress-bar.danger { background-color: #f44336; /* Roșu */ }
+
+        .controls { margin-bottom: 20px; display: flex; gap: 15px; align-items: center;}
+        .controls label, .controls select, .controls button { padding: 8px; border-radius: 4px; border: 1px solid #ddd;}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Monitorizare Vehicule Transport</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Hartă Live</a>
+            <a href="{{ url_for('history_page') }}">Istoric și Rapoarte</a>
+            <a href="{{ url_for('maintenance_page') }}">Mentenanță</a>
+        </nav>
+    </header>
+
+    <main class="content-page-container">
+        <h2 class="page-title">Mentenanță Preventivă Vehicule</h2>
+
+        <div class="controls">
+            <label for="maintenanceVehicleSelect">Selectează Vehicul:</label>
+            <select id="maintenanceVehicleSelect">
+                <option value="">-- Selectează un vehicul --</option>
+                {% for vehicle in vehicles %}
+                <option value="{{ vehicle.vehicle_id }}">{{ vehicle.vehicle_id }}</option>
+                {% endfor %}
+            </select>
+            <button id="fetchMaintenanceDataBtn">Verifică Stare Mentenanță</button>
+        </div>
+
+        <div id="vehicleCurrentStatus" class="vehicle-status-card" style="display:none;">
+            <h3>Stare Curentă Vehicul: <span id="statusVehicleId">N/A</span></h3>
+            <p><strong>Odometru:</strong> <span id="statusOdometer">N/A</span> km</p>
+            <p><strong>Ore Motor:</strong> <span id="statusEngineHours">N/A</span> ore</p>
+        </div>
+
+        <div id="maintenanceItemsContainer">
+            <p>Selectați un vehicul pentru a vedea recomandările de mentenanță.</p>
+            <!-- Itemele de mentenanță vor fi populate de JavaScript -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Aplicație Monitorizare Vehicule</p>
+    </footer>
+
+    <script>
+        const vehicleSelect = document.getElementById('maintenanceVehicleSelect');
+        const fetchDataBtn = document.getElementById('fetchMaintenanceDataBtn');
+        const statusContainer = document.getElementById('vehicleCurrentStatus');
+        const statusVehicleIdSpan = document.getElementById('statusVehicleId');
+        const statusOdometerSpan = document.getElementById('statusOdometer');
+        const statusEngineHoursSpan = document.getElementById('statusEngineHours');
+        const maintenanceItemsContainer = document.getElementById('maintenanceItemsContainer');
+
+        fetchDataBtn.addEventListener('click', async () => {
+            const vehicleId = vehicleSelect.value;
+            if (!vehicleId) {
+                alert("Vă rugăm să selectați un vehicul.");
+                statusContainer.style.display = 'none';
+                maintenanceItemsContainer.innerHTML = '<p>Selectați un vehicul pentru a vedea recomandările de mentenanță.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/vehicle/${vehicleId}/maintenance_status`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                statusVehicleIdSpan.textContent = data.vehicle_id;
+                statusOdometerSpan.textContent = data.current_odometer.toFixed(0);
+                statusEngineHoursSpan.textContent = data.current_engine_hours.toFixed(1);
+                statusContainer.style.display = 'block';
+
+                maintenanceItemsContainer.innerHTML = ''; // Clear previous items
+                if (data.maintenance_schedule && data.maintenance_schedule.length > 0) {
+                    data.maintenance_schedule.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.classList.add('maintenance-item');
+
+                        let progressBarKmHTML = '';
+                        if (item.km_interval) {
+                            const percentKm = Math.min(100, (item.km_since_last / item.km_interval) * 100);
+                            let kmBarClass = 'progress-bar';
+                            if (percentKm > 80) kmBarClass += ' warning';
+                            if (percentKm >= 100) kmBarClass += ' danger';
+                            progressBarKmHTML = `
+                                <p>Următoarea la ${item.next_km_due.toFixed(0)} km (în ${item.km_remaining.toFixed(0)} km). Progres: ${percentKm.toFixed(0)}%</p>
+                                <div class="progress-bar-container">
+                                    <div class="${kmBarClass}" style="width: ${percentKm}%;">${item.km_since_last.toFixed(0)} / ${item.km_interval} km</div>
+                                </div>`;
+                        }
+
+                        let progressBarHoursHTML = '';
+                        if (item.hours_interval) {
+                            const percentHours = Math.min(100, (item.hours_since_last / item.hours_interval) * 100);
+                            let hoursBarClass = 'progress-bar';
+                            if (percentHours > 80) hoursBarClass += ' warning';
+                            if (percentHours >= 100) hoursBarClass += ' danger';
+                             progressBarHoursHTML = `
+                                <p>Următoarea la ${item.next_hours_due.toFixed(1)} ore (în ${item.hours_remaining.toFixed(1)} ore). Progres: ${percentHours.toFixed(0)}%</p>
+                                <div class="progress-bar-container">
+                                    <div class="${hoursBarClass}" style="width: ${percentHours}%;">${item.hours_since_last.toFixed(1)} / ${item.hours_interval} ore</div>
+                                </div>`;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <h4>${item.service_name}</h4>
+                            <p>Ultima mentenanță: ${item.last_serviced_km.toFixed(0)} km / ${item.last_serviced_hours.toFixed(1)} ore</p>
+                            ${progressBarKmHTML}
+                            ${progressBarHoursHTML}
+                            <small>Interval recomandat:
+                                ${item.km_interval ? item.km_interval + ' km' : ''}
+                                ${item.km_interval && item.hours_interval ? ' / ' : ''}
+                                ${item.hours_interval ? item.hours_interval + ' ore' : ''}
+                            </small>
+                        `;
+                        maintenanceItemsContainer.appendChild(itemDiv);
+                    });
+                } else {
+                    maintenanceItemsContainer.innerHTML = '<p>Nu există un program de mentenanță definit sau nu s-au putut calcula datele.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error fetching maintenance data:", error);
+                statusContainer.style.display = 'none';
+                maintenanceItemsContainer.innerHTML = '<p>Eroare la încărcarea datelor de mentenanță.</p>';
+                alert("Eroare la încărcarea datelor de mentenanță.");
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('navMaintenance').classList.add('active');
+        });
+    </script>
+</body>
+</html>

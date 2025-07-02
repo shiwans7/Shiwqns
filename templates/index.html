@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorizare Vehicule</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Monitorizare Vehicule Transport</h1>
+        <nav>
+            <a href="{{ url_for('index') }}" id="navIndex">Hartă Live</a>
+            <a href="{{ url_for('history_page') }}" id="navHistory">Istoric și Rapoarte</a>
+            <a href="{{ url_for('maintenance_page') }}" id="navMaintenance">Mentenanță</a>
+        </nav>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Control Panou</h2>
+            <div class="vehicle-selector">
+                <label for="vehicleSelect">Selectează Vehicul:</label>
+                <select id="vehicleSelect">
+                    <option value="">-- Toate Vehiculele --</option>
+                    {% for vehicle in vehicles %}
+                    <option value="{{ vehicle.vehicle_id }}">{{ vehicle.vehicle_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button id="showHistoryBtn">Afișează Istoric Traseu</button>
+            <button id="clearHistoryBtn">Curăță Istoric de pe Hartă</button>
+
+            <div id="vehicleInfoPanel" class="vehicle-info-panel">
+                <h3>Informații Vehicul Selectat</h3>
+                <p>Selectați un vehicul pentru a vedea detalii sau click pe un marker.</p>
+                {-- Detaliile vor fi populate de JavaScript --}
+            </div>
+        </aside>
+        <main>
+            <div id="mapid"></div>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2023 Aplicație Monitorizare Vehicule</p>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('navIndex').classList.add('active');
+        });
+    </script>
+</body>
+</html>
